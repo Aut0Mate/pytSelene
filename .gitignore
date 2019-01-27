@@ -1,5 +1,11 @@
 # ignore all logs
-*.logs
+*.log
 
 # ignore all .pyc files
 *.pyc
+
+# Pycharm folder
+.idea/
+
+# Virtual Env
+.venv/
