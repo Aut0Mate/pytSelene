@@ -1,0 +1,262 @@
+1. Install pip
+
+& python -m pip install --upgrade pip
+
+2. Install pipenv (While pip alone is often sufficient for personal use, 
+Pipenv is recommended for collaborative projects as it’s a higher-level tool that simplifies dependency management for common use cases.)
+
+$ pip install pipenv
+
+3. Create a Project directory (vts_auto)
+
+$ mkdir vts_auto
+
+you can also have Pipenv stick the virtualenv in project/.venv by setting the PIPENV_VENV_IN_PROJECT environment variable.
+
+$ export PIPENV_VENV_IN_PROJECT=1
+
+4. Install the pytest module in this directory - Alternatively you can start the pipenv shell (which will create your vertualenv if not alredy created)
+
+cd DependencyMgntDemoProject
+$ pipenv shell (Optional)
+$ pipenv install pytest
+
+
+Pipenv will install the pytest library and create a Pipfile for you in your project’s directory. 
+The Pipfile is used to track which dependencies your project needs in case you need to re-install them, such as when you share your project with others. 
+You’ll notice that two files get created, a Pipfile and Pipfile.lock. 
+
+5. Install other packages:
+
+$ pipenv install selene --pre
+$ pipenv instal pytest-html
+
+$ pipenv graph
+
+pytest-html==1.20.0
+  - pytest [required: >=3.0, installed: 4.1.1]
+    - atomicwrites [required: >=1.0, installed: 1.2.1]
+    - attrs [required: >=17.4.0, installed: 18.2.0]
+    - colorama [required: Any, installed: 0.4.1]
+    - more-itertools [required: >=4.0.0, installed: 5.0.0]
+      - six [required: >=1.0.0,<2.0.0, installed: 1.12.0]
+    - pluggy [required: >=0.7, installed: 0.8.1]
+    - py [required: >=1.5.0, installed: 1.7.0]
+    - setuptools [required: Any, installed: 40.6.3]
+    - six [required: >=1.10.0, installed: 1.12.0]
+  - pytest-metadata [required: Any, installed: 1.8.0]
+    - pytest [required: >=2.9.0, installed: 4.1.1]
+      - atomicwrites [required: >=1.0, installed: 1.2.1]
+      - attrs [required: >=17.4.0, installed: 18.2.0]
+      - colorama [required: Any, installed: 0.4.1]
+      - more-itertools [required: >=4.0.0, installed: 5.0.0]
+        - six [required: >=1.0.0,<2.0.0, installed: 1.12.0]
+      - pluggy [required: >=0.7, installed: 0.8.1]
+      - py [required: >=1.5.0, installed: 1.7.0]
+      - setuptools [required: Any, installed: 40.6.3]
+      - six [required: >=1.10.0, installed: 1.12.0]
+selene==1.0.0a13
+  - backports.functools-lru-cache [required: Any, installed: 1.5]
+  - future [required: Any, installed: 0.17.1]
+  - selenium [required: Any, installed: 3.141.0]
+    - urllib3 [required: Any, installed: 1.24.1]
+  - six [required: Any, installed: 1.12.0]
+  - webdriver-manager [required: Any, installed: 1.7]
+    - configparser [required: Any, installed: 3.5.1]
+    - crayons [required: Any, installed: 0.1.2]
+      - colorama [required: Any, installed: 0.4.1]
+    - requests [required: Any, installed: 2.21.0]
+      - certifi [required: >=2017.4.17, installed: 2018.11.29]
+      - chardet [required: >=3.0.2,<3.1.0, installed: 3.0.4]
+      - idna [required: >=2.5,<2.9, installed: 2.8]
+      - urllib3 [required: >=1.21.1,<1.25, installed: 1.24.1]
+-----------------------------------------------  SKIP TO 11 IF YOU DONT WANT TO DEPLOY IN PRODUCTION  ------------------------------------------------------------
+
+6. Okay, so let’s say you’ve got everything working in your local development environment and you’re ready to push it to production. 
+To do that, you need to lock your environment so you can ensure you have the same one in production:
+
+$ pipenv lock
+
+This will create/update your Pipfile.lock, which you’ll never need to (and are never meant to) edit manually. 
+You should always use the generated file.
+
+7. Now, once you get your code and Pipfile.lock in your production environment, you should install the last successful environment recorded:
+
+$ pipenv install --ignore-pipfile
+
+This tells Pipenv to ignore the Pipfile for installation and use what’s in the Pipfile.lock. Given this Pipfile.lock, Pipenv will create the exact same environment 
+you had when you ran pipenv lock, sub-dependencies and all.
+
+The lock file enables deterministic builds by taking a snapshot of all the versions of packages in an environment (similar to the result of a pip freeze).
+
+Now let’s say another developer wants to make some additions to your code. In this situation, they would get the code, including the Pipfile, and use this command:
+
+$ pipenv install --dev
+
+7. This installs all the dependencies needed for development, which includes both the regular dependencies and those you specified with the --dev argument during install.
+When an exact version isn’t specified in the Pipfile, the install command gives the opportunity for dependencies (and sub-dependencies) to update their versions.
+
+8. You can run a command in the virtual environment without launching a shell:
+
+$ pipenv run <insert command here>
+
+Check for security vulnerabilities (and PEP 508 requirements) in your environment:
+
+$ pipenv check
+
+Now, let’s say you no longer need a package. You can uninstall it:
+
+$ pipenv uninstall numpy
+
+Additionally, let’s say you want to completely wipe all the installed packages from your virtual environment:
+
+$ pipenv uninstall --all
+
+You can replace --all with --all-dev to just remove dev packages.
+
+9. Quick commands to find out where stuff is. How to find out where your virtual environment is:
+
+$ pipenv --venv
+How to find out where your project home is:
+
+$ pipenv --where
+
+10. To remove the environment, you can run the pipenv command with the --rm option as in:
+
+$ pipenv --rm
+
+This will remove the virtualenv created for you under ~/.virtualenvs
+
+See https://docs.pipenv.org/#cmdoption-pipenv-rm
+---------------------------------------------------------------------------------------------------------------------------------------
+
+11. Now in your project dir, create the following directories:
+configurations - for logging.ini
+drivers - for driver files in case
+logs
+page_objects
+reports
+test_data
+test_suites
+tests
+utils
+     - driver_utils
+	 - general_utils
+	 
+
+$ mkdir configurations
+
+$ mkdir drivers
+
+$ mkdir logs
+
+$ mkdir page_objects
+
+$ mkdir reports
+
+$ mkdir test_data
+
+$ mkdir test_suites
+
+$ mkdir tests
+
+$ mkdir utils/driver_utils
+
+$ mkdir utils/general_utils
+
+12. Open the project in PyCharm Community Editon
+
+13. Create conftest.py under project folder. Any fixtures you want to share across the project should be in this file.
+
+14. Create definitions.py to define all the project directory paths as constants.
+
+SAMPLE definitions.py:
+# All Project directory paths are listed here as constants
+from os.path import join as stitch
+import os
+import sys
+
+# Add Current Working Directory to sys.path
+sys.path.append(os.getcwd())
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # Project Root
+DRIVERS_DIR = stitch(ROOT_DIR, 'drivers')
+CONFIGS_DIR = stitch(ROOT_DIR, 'configurations')
+LOGGING_CONFIG_FILE = stitch(CONFIGS_DIR, 'logging.ini')
+LOGS_DIR = stitch(ROOT_DIR, 'logs')
+LOG_FILE = stitch(LOGS_DIR, 'selenium.log')
+TEST_DATA_DIR = stitch(ROOT_DIR, 'test_data')
+TESTS_DIR = stitch(ROOT_DIR, 'tests')
+TESTS_DIR_REL = '../tests/'
+TEST_SUITES_DIR = stitch(ROOT_DIR, 'test_suites')
+REPORTS_DIR = stitch(ROOT_DIR, 'reports')
+REPORTS_DIR_REL = '../reports/'
+SCREENSHOTS_DIR = stitch(ROOT_DIR, 'screenshots')
+
+15. In the configurations folder create the logging.ini.
+logfileHandler code is commented in the below file. Since we need to hardcode the file path in this config file,
+it creates a problem when the pytest is run from different directories. Hence we add the logfileHandler in the Logger class
+__new__ method, that we create next.
+
+SAMPLE logging.ini:
+[loggers]
+keys=root
+
+[handlers]
+keys=consoleHandler
+;keys=consoleHandler,logfileHandler
+
+[formatters]
+keys=simpleFormatter
+
+[logger_root]
+level=INFO
+handlers=consoleHandler
+;handlers=consoleHandler,logfileHandler
+
+[handler_consoleHandler]
+class=StreamHandler
+level=DEBUG
+formatter=simpleFormatter
+args=(sys.stdout,)
+
+;[handler_logfileHandler]
+;class=FileHandler
+;level=DEBUG
+;formatter=simpleFormatter
+;args=('selenium.log', 'w')
+
+[formatter_simpleFormatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+datefmt=
+
+16. Create logger.py in ~/utils/general_utils with following code:
+
+import logging
+import os
+from logging.config import fileConfig
+from definitions import LOGGING_CONFIG_FILE, LOG_FILE
+
+
+class Logger:
+
+    __instance = None
+
+    def __new__(cls, val):
+        if Logger.__instance is None:
+            Logger.__instance = object.__new__(cls)
+            Logger.__instance.val = val
+            fileConfig(LOGGING_CONFIG_FILE)
+        cls.log = logging.getLogger(os.path.basename(val))
+        
+        # Add the logfileHandler
+        fh = logging.FileHandler(filename=LOG_FILE, mode='w')
+        fh.setLevel("DEBUG")
+        formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+        fh.setFormatter(formatter)
+        cls.log.addHandler(fh)
+
+        return Logger.__instance
+
+
+17. Create a init_driver.py in ~/utils/driver_utils
