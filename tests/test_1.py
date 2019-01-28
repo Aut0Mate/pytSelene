@@ -7,5 +7,5 @@ def test_selene_driver_init():
 
 
 def test_selene_2():
-    browser.open_url("http://www.google.com")
-    assert 'Google' in browser.title()
+    browser.open_url("https://www.quora.com/")
+    assert 'Quora' in browser.title()
