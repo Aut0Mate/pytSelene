@@ -259,4 +259,75 @@ class Logger:
         return Logger.__instance
 
 
-17. Create a init_driver.py in ~/utils/driver_utils
+17. Create a init_driver.py in ~/utils/driver_utils and add the Init_driver and quit driver methods;
+
+from selene import browser
+from selene.browsers import BrowserName
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+
+from utils.general_utils.logger import Logger
+
+driver: webdriver = None
+log = Logger(__file__).log
+
+
+def initialize_driver(b=BrowserName.CHROME):
+    global driver
+
+    if not driver:
+        log.info("Driver is None. Initializing [{}] driver".format(b) )
+        if b == BrowserName.CHROME:
+            driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+        elif b == BrowserName.FIREFOX:
+            driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+        else:
+            raise Exception("Invalid Browser Name provided")
+    log.info("Setting Selene driver")
+    browser.set_driver(driver)
+    driver.maximize_window()
+    return driver
+
+
+def quit_driver():
+    global driver
+    log.info("Quitting the driver")
+    driver.quit()
+    driver = None
+    log.info("Driver is None")
+
+18. Now in the conftest.py add a fixture to use driver and quit driver after use.
+We wil make this fixture with the scope session so it will be called aonly once b4 the tests start
+and the driver will be avilable to all tests as long as the session in active. we will aslo make it auto isable so you don't have to pass the
+fixture parameter in the test method.
+
+import pytest
+
+from utils.driver_utils.init_driver import initialize_driver, quit_driver
+
+
+@pytest.fixture(scope="session", autouse=True)
+def driver():
+    yield initialize_driver()
+    quit_driver()
+
+19. Now create a test file under the tests folder: /tests/test_titles and add tests
+to check the title of google and quora websites. When the test starts the driver is initialized by the autouse fixture
+in conftest.py and the driver is available to us via selene as we set the selene driver in that method.
+
+from selene import browser
+
+
+def test_selene_driver_init():
+    browser.open_url("http://www.google.com")
+    assert 'Google' in browser.title()
+
+
+def test_selene_2():
+    browser.open_url("https://www.quora.com/")
+    assert 'Quora' in browser.title()
+
+20. Your basic setup is now ready. Just go and run the py.test command on the project:
+
+$ py.test -v --capture=no

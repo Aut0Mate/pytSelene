@@ -23,6 +23,7 @@ def initialize_driver(b=BrowserName.CHROME):
             raise Exception("Invalid Browser Name provided")
     log.info("Setting Selene driver")
     browser.set_driver(driver)
+    driver.maximize_window()
     return driver
 
 
