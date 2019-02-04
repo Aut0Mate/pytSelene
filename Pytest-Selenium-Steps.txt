@@ -30,12 +30,14 @@ You’ll notice that two files get created, a Pipfile and Pipfile.lock.
 
 $ pipenv install selene --pre
 $ pipenv instal pytest-html
+$ pipenv install pillow
 
 $ pipenv graph
 
+Pillow==5.4.1
 pytest-html==1.20.0
-  - pytest [required: >=3.0, installed: 4.1.1]
-    - atomicwrites [required: >=1.0, installed: 1.2.1]
+  - pytest [required: >=3.0, installed: 4.2.0]
+    - atomicwrites [required: >=1.0, installed: 1.3.0]
     - attrs [required: >=17.4.0, installed: 18.2.0]
     - colorama [required: Any, installed: 0.4.1]
     - more-itertools [required: >=4.0.0, installed: 5.0.0]
@@ -45,8 +47,8 @@ pytest-html==1.20.0
     - setuptools [required: Any, installed: 40.6.3]
     - six [required: >=1.10.0, installed: 1.12.0]
   - pytest-metadata [required: Any, installed: 1.8.0]
-    - pytest [required: >=2.9.0, installed: 4.1.1]
-      - atomicwrites [required: >=1.0, installed: 1.2.1]
+    - pytest [required: >=2.9.0, installed: 4.2.0]
+      - atomicwrites [required: >=1.0, installed: 1.3.0]
       - attrs [required: >=17.4.0, installed: 18.2.0]
       - colorama [required: Any, installed: 0.4.1]
       - more-itertools [required: >=4.0.0, installed: 5.0.0]
@@ -62,15 +64,14 @@ selene==1.0.0a13
     - urllib3 [required: Any, installed: 1.24.1]
   - six [required: Any, installed: 1.12.0]
   - webdriver-manager [required: Any, installed: 1.7]
-    - configparser [required: Any, installed: 3.5.1]
+    - configparser [required: Any, installed: 3.7.1]
     - crayons [required: Any, installed: 0.1.2]
       - colorama [required: Any, installed: 0.4.1]
     - requests [required: Any, installed: 2.21.0]
       - certifi [required: >=2017.4.17, installed: 2018.11.29]
       - chardet [required: >=3.0.2,<3.1.0, installed: 3.0.4]
       - idna [required: >=2.5,<2.9, installed: 2.8]
-      - urllib3 [required: >=1.21.1,<1.25, installed: 1.24.1]
------------------------------------------------  SKIP TO 11 IF YOU DONT WANT TO DEPLOY IN PRODUCTION  ------------------------------------------------------------
+      - urllib3 [required: >=1.21.1,<1.25, installed: 1.24.1]-----------------------------------------------  SKIP TO 11 IF YOU DONT WANT TO DEPLOY IN PRODUCTION  ------------------------------------------------------------
 
 6. Okay, so let’s say you’ve got everything working in your local development environment and you’re ready to push it to production. 
 To do that, you need to lock your environment so you can ensure you have the same one in production:
@@ -144,25 +145,27 @@ utils
 	 - general_utils
 	 
 
-$ mkdir configurations
+mkdir configurations
 
-$ mkdir drivers
+mkdir drivers
 
-$ mkdir logs
+mkdir logs
 
-$ mkdir page_objects
+mkdir page_objects
 
-$ mkdir reports
+mkdir reports
 
-$ mkdir test_data
+mkdir test_data
 
-$ mkdir test_suites
+mkdir test_suites
 
-$ mkdir tests
+mkdir tests
 
-$ mkdir utils/driver_utils
+mkdir utils
 
-$ mkdir utils/general_utils
+mkdir utils/driver_utils
+
+mkdir utils/general_utils
 
 12. Open the project in PyCharm Community Editon
 
@@ -194,47 +197,49 @@ REPORTS_DIR_REL = '../reports/'
 SCREENSHOTS_DIR = stitch(ROOT_DIR, 'screenshots')
 
 15. In the configurations folder create the logging.ini.
-logfileHandler code is commented in the below file. Since we need to hardcode the file path in this config file,
-it creates a problem when the pytest is run from different directories. Hence we add the logfileHandler in the Logger class
-__new__ method, that we create next.
+In logfileHandler, the log file path is set to just selenium.log. This will create a log file in the directory where your program runs.
+But pytest can be ran from any directory and we want the log file to be in the logs directory. To keep our project portable we cannot
+hard-code the log file path in the ini file. We will write code to build the path and add to logging.ini at runtime.
 
 SAMPLE logging.ini:
 [loggers]
-keys=root
+[loggers]
+keys = root
 
 [handlers]
-keys=consoleHandler
-;keys=consoleHandler,logfileHandler
+keys = consoleHandler,logfileHandler
 
 [formatters]
-keys=simpleFormatter
+keys = simpleFormatter
 
 [logger_root]
-level=INFO
-handlers=consoleHandler
-;handlers=consoleHandler,logfileHandler
+level = INFO
+handlers = consoleHandler,logfileHandler
 
 [handler_consoleHandler]
-class=StreamHandler
-level=DEBUG
-formatter=simpleFormatter
-args=(sys.stdout,)
+class = StreamHandler
+level = DEBUG
+formatter = simpleFormatter
+args = (sys.stdout,)
 
-;[handler_logfileHandler]
-;class=FileHandler
-;level=DEBUG
-;formatter=simpleFormatter
-;args=('selenium.log', 'w')
+[handler_logfileHandler]
+class = FileHandler
+level = DEBUG
+formatter = simpleFormatter
+args = ('selenium.log', 'w')
 
 [formatter_simpleFormatter]
-format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
-datefmt=
+format = %(asctime)s - %(name)s - %(levelname)s - %(message)s
+datefmt = 
 
-16. Create logger.py in ~/utils/general_utils with following code:
+16. Create logger.py in ~/utils/general_utils with following code which makes the Logger singleton 
+and also writes the log file path to logging.ini:
 
 import logging
 import os
+from configparser import ConfigParser
 from logging.config import fileConfig
+
 from definitions import LOGGING_CONFIG_FILE, LOG_FILE
 
 
@@ -246,16 +251,30 @@ class Logger:
         if Logger.__instance is None:
             Logger.__instance = object.__new__(cls)
             Logger.__instance.val = val
+            config = ConfigParser()
+            config.read(LOGGING_CONFIG_FILE)
+            # writing the 'path to log file' on the fly, to logging.ini since pytest can run from anywhere in the
+            # project.
+            # putting '../logs/selenium.log' in ini will create 'path not found' exception if pytest not run from root
+            # folder
+            # hence adding the calculated Logfile path to logging.ini
+
+            # If the 'path to log file' contains '\v' then it is getting converted to 'x0b' when fileConfig is parsing
+            # it and raising an exception
+            # so need to escape it
+            if r'\v' in LOG_FILE:
+                path = LOG_FILE.replace(r'\v', r'\\v')
+            else:
+                path = LOG_FILE
+            config['handler_logfileHandler']['args'] = "('" + path + "', 'w')"
+
+            # writing to logging.ini
+            with open(LOGGING_CONFIG_FILE, 'w') as configfile:
+                config.write(configfile)
+
+            # parse the logging.ini config
             fileConfig(LOGGING_CONFIG_FILE)
         cls.log = logging.getLogger(os.path.basename(val))
-        
-        # Add the logfileHandler
-        fh = logging.FileHandler(filename=LOG_FILE, mode='w')
-        fh.setLevel("DEBUG")
-        formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
-        fh.setFormatter(formatter)
-        cls.log.addHandler(fh)
-
         return Logger.__instance
 
 
@@ -298,7 +317,7 @@ def quit_driver():
     log.info("Driver is None")
 
 18. Now in the conftest.py add a fixture to use driver and quit driver after use.
-We wil make this fixture with the scope session so it will be called aonly once b4 the tests start
+We wil make this fixture with the scope session so it will be called only once b4 the tests start
 and the driver will be avilable to all tests as long as the session in active. we will aslo make it auto isable so you don't have to pass the
 fixture parameter in the test method.
 
@@ -319,15 +338,168 @@ in conftest.py and the driver is available to us via selene as we set the selene
 from selene import browser
 
 
-def test_selene_driver_init():
+def test_google_title():
     browser.open_url("http://www.google.com")
     assert 'Google' in browser.title()
 
 
-def test_selene_2():
+def test_quora_title():
     browser.open_url("https://www.quora.com/")
     assert 'Quora' in browser.title()
 
+
+def test_wiki_title():
+    browser.open_url("https://www.wikipedia.com/")
+    assert 'wiki' in browser.title()
+
 20. Your basic setup is now ready. Just go and run the py.test command on the project:
 
-$ py.test -v --capture=no
+$ pipenv run py.test -v --capture=no --html=report.html
+
+This will run the tests, create a log file in the logs dir and create report.html in the project dir. Check the report.html and delete it for now
+
+21. Now we need some logging before a test starts and after it ends. So lets add another autouse fixture in conftest.py:
+
+@pytest.fixture(scope="function", autouse=True)
+def log_test_details(request):
+    text = " Starting test [" + request.node.name + "] "
+    log.info(text.center(61, "="))
+    yield
+    log.info(" [{}] Completed ".format(request.node.name).center(61, "="))
+    log.info("")
+	
+22. Lets add some useful general utility methods in utils/general_utils/gen_utils.py:
+
+import os
+import time
+from time import sleep
+
+from PIL import Image
+from selene import browser
+from selene.conditions import exist
+from selene.support.jquery_style_selectors import s
+from selenium.webdriver.common.by import By
+
+from definitions import SCREENSHOTS_DIR, TESTS_DIR
+from utils.general_utils.logger import Logger
+
+log = Logger(__file__).log
+
+
+def wait(time_to_wait: float=0.5):
+    """
+    Calls the time.sleep() for provided time_to_wait
+    :param time_to_wait:
+    :return:
+    """
+    sleep(time_to_wait)
+
+
+def is_element_present(locator: By):
+    """
+    Verifies if an element is present in the dom
+    :param locator:
+    :return:
+    """
+    try:
+        s(locator).should(exist, 5)
+        return True
+    except Exception as e:
+        log.info(">>>> ", e)
+        return False
+
+
+def capture_screenshot(filename: str):
+    """
+    Captures screen-shot with the provided filename and puts in the screenshots directory under reports directory
+    :param filename:
+    :return:
+    """
+    log.info("Capturing failure screenshot " + filename)
+    browser.take_screenshot(path=SCREENSHOTS_DIR, filename=filename)
+    return True
+
+
+def get_test_file_path(test_file: str):
+    """
+    Returns absolute path to the test_file
+    :param test_file:
+    :return:
+    """
+    return os.path.join(TESTS_DIR, test_file)
+
+
+def take_full_page_screenshot(filename: str):
+    """
+    Takes the screen-shot of the entire WebPage and saves with the filename passed as argument
+    :param filename:
+    :return:
+    """
+    log.debug("Starting the full page screenshot utility...")
+    total_width = browser.execute_script("return document.body.offsetWidth")
+    total_height = browser.execute_script("return document.body.parentNode.scrollHeight")
+    viewport_width = browser.execute_script("return document.body.clientWidth")
+    viewport_height = browser.execute_script("return window.innerHeight")
+    log.debug("Total: ({}, {}), Viewport: ({}, {})".format(total_width, total_height, viewport_width, viewport_height))
+
+    browser.execute_script("window.scrollTo(0, 0)")
+    patches = []
+
+    captured_height = 0
+    while captured_height < total_height:
+        captured_width = 0
+        current_height = captured_height + viewport_height
+
+        if current_height > total_height:
+            current_height = total_height
+
+        while captured_width < total_width:
+            current_width = captured_width + viewport_width
+
+            if current_width > total_width:
+                current_width = total_width
+
+            log.debug("Appending to the patches ({}, {}, {}, {})".format(captured_width, captured_height, current_width,
+                                                                         current_height))
+            patches.append((captured_width, captured_height, current_width, current_height))
+
+            captured_width += viewport_width
+
+        captured_height += viewport_height
+
+    final_image = Image.new('RGB', (total_width, total_height))
+    previous = None
+    part = 0
+
+    for patch in patches:
+        if previous:
+            browser.execute_script("window.scrollTo({0}, {1})".format(patch[0], patch[1]))
+            log.debug("Scrolled to {}, {}".format(patch[0], patch[1]))
+            time.sleep(0.2)
+
+        file_name = "part_{}.png".format(part)
+        log.debug("Capturing {} ...".format(file_name))
+
+        browser.take_screenshot(file_name)
+        screenshot = Image.open(file_name)
+
+        if patch[1] + viewport_height > total_height:
+            offset = (patch[0], total_height - viewport_height)
+        else:
+            offset = (patch[0], patch[1])
+
+        log.debug("Adding to stitched image with offset ({0}, {1})".format(offset[0], offset[1]))
+        final_image.paste(screenshot, offset)
+
+        del screenshot
+
+        os.remove(file_name)
+        part += 1
+        previous = patch
+
+    final_image.save(os.path.join(SCREENSHOTS_DIR, filename))
+    log.debug("Full page screenshot workaround complete...")
+    return True
+
+23. Add more fixtures, one including to take screenshot and add to the pytest-html report:
+

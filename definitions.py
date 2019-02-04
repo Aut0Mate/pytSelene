@@ -18,4 +18,4 @@ TESTS_DIR_REL = '../tests/'
 TEST_SUITES_DIR = stitch(ROOT_DIR, 'test_suites')
 REPORTS_DIR = stitch(ROOT_DIR, 'reports')
 REPORTS_DIR_REL = '../reports/'
-SCREENSHOTS_DIR = stitch(ROOT_DIR, 'screenshots')
+SCREENSHOTS_DIR = stitch(REPORTS_DIR, 'screenshots')

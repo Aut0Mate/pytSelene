@@ -14,16 +14,18 @@ def initialize_driver(b=BrowserName.CHROME):
     global driver
 
     if not driver:
-        log.info("Driver is None. Initializing [{}] driver".format(b) )
+        log.info("Driver is None. Initializing [{}] driver".format(b))
         if b == BrowserName.CHROME:
-            driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+            options = webdriver.ChromeOptions()
+            options.add_argument(argument='disable-infobars')
+            driver = webdriver.Chrome(options=options, executable_path=ChromeDriverManager().install())
         elif b == BrowserName.FIREFOX:
             driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
         else:
             raise Exception("Invalid Browser Name provided")
     log.info("Setting Selene driver")
     browser.set_driver(driver)
-    driver.maximize_window()
+    driver.minimize_window()
     return driver
 
 
