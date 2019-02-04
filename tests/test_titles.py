@@ -4,9 +4,15 @@ import pytest
 from selene import browser
 from selene.conditions import visible
 from selene.support.jquery_style_selectors import s
-sys.path.append(os.getcwd())
-sys.path.append(os.path.join(os.getcwd(), os.pardir))
-from definitions import REPORTS_DIR_REL, TESTS_DIR, ROOT_DIR
+
+current_dir = os.getcwd()
+parent_dir = os.path.join(os.getcwd(), os.pardir)
+if current_dir not in sys.path:
+    sys.path.append(os.getcwd())
+if os.path.basename(current_dir) != "vts_auto":
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+from definitions import REPORTS_DIR, TESTS_DIR
 
 
 def test_google_title():
@@ -30,9 +36,6 @@ def test_selene_assert():
 
 
 if __name__ == '__main__':
-    sys.path.append(os.path.join(os.getcwd(), os.pardir))
-    sys.path.append(ROOT_DIR)
-
     print('PYTHON PATH: ' + str(sys.path))
-    pytest.main(['--html=' + REPORTS_DIR_REL + 'title_tests_report.html',
+    pytest.main(['--html=' + REPORTS_DIR + os.sep + 'title_tests_report.html',
                  '--self-contained-html', '-v', '-q', '-s', os.path.join(TESTS_DIR, 'test_titles.py')])

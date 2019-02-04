@@ -73,6 +73,16 @@ def pytest_runtest_makereport(item, call):
         if (report.skipped and xfail) or (report.failed and not xfail):
             file_name = report.nodeid.replace("::", "_")
             file_name = file_name.replace(".py", "_")
+            # when the teh command "python test\test_titles.py" is run from the root folder,
+            # the report.nodeid is 'test\test_titles.py' instead of 'test_titles.py'
+            # This causes the screenshots to be stored in a tests directory under screenshots directory
+            # Hence we replace the '/' or '\' by a '_'
+            # so that file_name is 'tests_test_titles' instead of 'tests\test_titles'
+            file_name = file_name.replace("/", "_")
+            file_name = file_name.replace("\\", "_")
+            print(":::::::::::::::::::::::::::::::::::::::::::")
+            print(file_name)
+            print(":::::::::::::::::::::::::::::::::::::::::::")
             if not os.path.exists(SCREENSHOTS_DIR):
                 os.mkdir(SCREENSHOTS_DIR, mode=0o777)
             try:
@@ -87,6 +97,3 @@ def pytest_runtest_makereport(item, call):
                                                                                               file_name + '.png')
                 extra.append(pytest_html.extras.html(html))
         report.extra = extra
-
-
-
