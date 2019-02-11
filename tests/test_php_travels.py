@@ -12,7 +12,7 @@ sys.path.append(os.pardir)
 def test_blog_link():
     browser.open_url("https://www.phptravels.net/")
     click_blog_link()
-    s(by_text("LATEST POSTS")).should_be(visible)
+    s(by_text("Latest Posts")).should_be(visible)
 
 
 def test_home_link():

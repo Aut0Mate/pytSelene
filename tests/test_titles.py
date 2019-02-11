@@ -4,14 +4,6 @@ import pytest
 from selene import browser
 from selene.conditions import visible
 from selene.support.jquery_style_selectors import s
-
-current_dir = os.getcwd()
-parent_dir = os.path.join(os.getcwd(), os.pardir)
-if current_dir not in sys.path:
-    sys.path.append(os.getcwd())
-if os.path.basename(current_dir) != "vts_auto":
-    if parent_dir not in sys.path:
-        sys.path.append(parent_dir)
 from definitions import REPORTS_DIR, TESTS_DIR
 
 

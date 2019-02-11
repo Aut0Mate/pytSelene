@@ -13,6 +13,7 @@ LOGGING_CONFIG_FILE = stitch(CONFIGS_DIR, 'logging.ini')
 LOGS_DIR = stitch(ROOT_DIR, 'logs')
 LOG_FILE = stitch(LOGS_DIR, 'selenium.log')
 TEST_DATA_DIR = stitch(ROOT_DIR, 'test_data')
+TEST_DATA_FILE = stitch(TEST_DATA_DIR, "test_data.xlsx")
 TESTS_DIR = stitch(ROOT_DIR, 'tests')
 TESTS_DIR_REL = '../tests/'
 TEST_SUITES_DIR = stitch(ROOT_DIR, 'test_suites')

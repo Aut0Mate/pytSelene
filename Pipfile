@@ -10,6 +10,7 @@ pytest = "*"
 selene = "*"
 pytest-html = "*"
 pillow = "*"
+openpyxl = "*"
 
 [requires]
 python_version = "3.6"
