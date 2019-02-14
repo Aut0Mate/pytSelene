@@ -63,7 +63,7 @@ def take_full_page_screenshot(filename: str):
     :param filename:
     :return:
     """
-    log.debug("Starting the full page screenshot utility...")
+    log.debug("Starting the full page screen-shot utility...")
     total_width = browser.execute_script("return document.body.offsetWidth")
     total_height = browser.execute_script("return document.body.parentNode.scrollHeight")
     viewport_width = browser.execute_script("return document.body.clientWidth")
@@ -129,3 +129,48 @@ def take_full_page_screenshot(filename: str):
     final_image.save(os.path.join(SCREENSHOTS_DIR, filename))
     log.debug("Full page screenshot workaround complete...")
     return True
+
+
+class SoftAssert:
+
+    """
+    This is an attempt to implement soft assert (verify), since it is not available in pytest.
+
+    using soft assert class methods the script execution will not stop on an assert failure, instead will be added to
+    the failures list.
+
+    In the end the assert_all method can be used to assert the list with an empty list
+    """
+
+    def __init__(self):
+        self._errors = []
+
+    def assert_equals(self, actual, expected, failure_message=None):
+        """
+        Soft assert if 2 objects are equal
+        :param actual:
+        :param expected:
+        :param failure_message:
+        :return:
+        """
+        if not failure_message:
+            failure_message = "Expected [%s] but found [%s]" % (expected, actual)
+        if actual != expected:
+            self._errors.append("[%s != %s]. " % (actual, expected) + failure_message)
+
+    def assert_true(self, expression, failure_message):
+        """
+        Soft assert if the expression is True
+        :param expression:
+        :param failure_message:
+        :return:
+        """
+        if not expression:
+            self._errors.append(failure_message)
+
+    def assert_all(self):
+        """
+        Assert all soft asserts
+        :return:
+        """
+        assert self._errors == [], '\n' + ('\n'.join(self._errors))
