@@ -110,7 +110,7 @@ def take_full_page_screenshot(filename: str):
 
         browser.take_screenshot(path=SCREENSHOTS_DIR, filename=file_name[:-4])
         file_name = os.path.join(SCREENSHOTS_DIR, file_name)
-        screenshot = Image.open(file_name)
+        screen_shot = Image.open(file_name)
 
         if patch[1] + viewport_height > total_height:
             offset = (patch[0], total_height - viewport_height)
@@ -118,16 +118,16 @@ def take_full_page_screenshot(filename: str):
             offset = (patch[0], patch[1])
 
         log.debug("Adding to stitched image with offset ({0}, {1})".format(offset[0], offset[1]))
-        final_image.paste(screenshot, offset)
+        final_image.paste(screen_shot, offset)
 
-        del screenshot
+        del screen_shot
 
         os.remove(file_name)
         part += 1
         previous = patch
 
     final_image.save(os.path.join(SCREENSHOTS_DIR, filename))
-    log.debug("Full page screenshot workaround complete...")
+    log.debug("Full page screen_shot workaround complete...")
     return True
 
 

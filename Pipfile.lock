@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5c38f08538fe32ae608f58eb57c727edb9ce63b4c29cdc4101dcb61cd4a1bff8"
+            "sha256": "31f5c657115c4a69402a0c219f035cbfb5457edc883c3d1655ca0612c841ff72"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -102,18 +102,18 @@
         },
         "more-itertools": {
             "hashes": [
-                "sha256:38a936c0a6d98a38bcc2d03fdaaedaba9f412879461dd2ceff8d37564d6522e4",
-                "sha256:c0a5785b1109a6bd7fac76d6837fd1feca158e54e521ccd2ae8bfe393cc9d4fc",
-                "sha256:fe7a7cae1ccb57d33952113ff4fa1bc5f879963600ed74918f1236e212ee50b9"
+                "sha256:0125e8f60e9e031347105eb1682cef932f5e97d7b9a1a28d9bf00c22a5daef40",
+                "sha256:590044e3942351a1bdb1de960b739ff4ce277960f2425ad4509446dbace8d9d1"
             ],
-            "version": "==5.0.0"
+            "markers": "python_version > '2.7'",
+            "version": "==6.0.0"
         },
         "openpyxl": {
             "hashes": [
-                "sha256:93c00466fe15469bffc74e05ce83982b6efb5e0c1529cea13dc2024379db5d3b"
+                "sha256:70da6b45a5925285b6a3d93570b45f4402eb2d335740163a58eef533b139565c"
             ],
             "index": "pypi",
-            "version": "==2.6.0b1"
+            "version": "==2.6.0"
         },
         "pillow": {
             "hashes": [
@@ -167,11 +167,11 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:65aeaa77ae87c7fc95de56285282546cfa9c886dc8e5dc78313db1c25e21bc07",
-                "sha256:6ac6d467d9f053e95aaacd79f831dbecfe730f419c6c7022cb316b365cd9199d"
+                "sha256:80cfd9c8b9e93f419abcc0400e9f595974a98e44b6863a77d3e1039961bfc9c4",
+                "sha256:c2396a15726218a2dfef480861c4ba37bd3952ebaaa5b0fede3fc23fddcd7f8c"
             ],
             "index": "pypi",
-            "version": "==4.2.0"
+            "version": "==4.2.1"
         },
         "pytest-html": {
             "hashes": [
@@ -209,6 +209,14 @@
                 "sha256:deaf32b60ad91a4611b98d8002757f29e6f2c2d5fcaf202e1c9ad06d6772300d"
             ],
             "version": "==3.141.0"
+        },
+        "selenium-wire": {
+            "hashes": [
+                "sha256:a35837a25c7046833d4c022de03309336c7b3f5055d0b8db267f2f3e9829c7c6",
+                "sha256:dd52803e4624ae460e0c263191a301aa2d1a08e669c36132b34ee6540f4bdf7c"
+            ],
+            "index": "pypi",
+            "version": "==1.0.1"
         },
         "six": {
             "hashes": [

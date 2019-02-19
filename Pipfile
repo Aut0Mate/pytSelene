@@ -11,6 +11,8 @@ selene = "*"
 pytest-html = "*"
 pillow = "*"
 openpyxl = "*"
+selenium-wire = "*"
+openssl = "*"
 
 [requires]
 python_version = "3.6"
