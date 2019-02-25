@@ -1,6 +1,6 @@
 from selene import browser
 from selene.browsers import BrowserName
-from seleniumwire import webdriver
+from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 

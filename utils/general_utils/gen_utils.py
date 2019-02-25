@@ -23,14 +23,15 @@ def wait(time_to_wait: float=0.5):
     sleep(time_to_wait)
 
 
-def is_element_present(locator: By):
+def is_element_present(locator: By, time_to_wait=2):
     """
-    Verifies if an element is present in the dom
+    Check if an elemnt is present in the dom
     :param locator:
+    :param time_to_wait:
     :return:
     """
     try:
-        s(locator).should(exist, 5)
+        s(locator).should(exist, time_to_wait)
         return True
     except Exception as e:
         log.info(">>>> ", e)

@@ -66,6 +66,7 @@ def pytest_runtest_makereport(item, call):
     pytest_html = item.config.pluginmanager.getplugin('html')
     outcome = yield
     report = outcome.get_result()
+    # setting the attribute so that it can be accessed from all fixtures. refer to the fixture log_test_details()
     setattr(item, "report_" + report.when, report)
     extra = getattr(report, 'extra', [])
     if report.when == 'call' or report.when == 'setup':

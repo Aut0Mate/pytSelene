@@ -1,4 +1,4 @@
-from selene import browser, wait
+from selene import browser
 from selene.bys import by_xpath
 from selene.support.jquery_style_selectors import s
 from selenium.webdriver.support import expected_conditions
