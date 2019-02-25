@@ -651,8 +651,10 @@ def pytest_runtest_makereport(item, call):
         report.extra = extra
 
 
-24. Add __init__.py to the project dir to supress selenium-wire logs and resolve the issue of "module no found" by adding the project dir to sys.path
-irespective of in wichever dir the py.test commad is run.
+24. we will Add __init__.py to the project dir to suppress selenium-wire logs and resolve the issue of "module no found" by adding the project dir to sys.path
+irrespective of in whichever dir the py.test command is run. Also if we are going to run the test files directly from any dir, we need to add the __init__.py in
+the /tests and /test_suites directories and add the statement "from __init__ import *" to all the test and test_suite files.
+EXAMPLE: __init__.py
 
 import os
 import logging
@@ -670,17 +672,18 @@ PROJECT_NAME = "vts_auto"
 logging.getLogger("seleniumwire.proxy.handler").setLevel(logging.WARNING)
 
 p = Path(os.getcwd())
-if str(p).endswith(PROJECT_NAME):  # when pytest is run from root directory
-    sys.path.insert(0, str(p))
-else:  # when pytest is run from roots subdirectories
+
+if not str(p).endswith(PROJECT_NAME):  # when pytest is run from roots subdirectories
     for path in p.parents:
         if str(path).endswith(PROJECT_NAME):
-            sys.path.insert(0, str(path))
+            if str(path) not in sys.path: sys.path.insert(0, str(path))
             break
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<XXXXXX>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-for line in sys.path:
-    print(line)
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<XXXXXX>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+else:
+    if str(p) not in sys.path: sys.path.insert(0, str(p))
+
+for path in sys.path:
+    print(path)
+
 
 25. Now we can add excel_utils.py to ~/utils/general_utils/ which will have methods to read test data from excel as required by the
 @pytest.mark.parametrize fixture;
@@ -828,3 +831,67 @@ def click_blog_link():
 def click_home_link():
     s(by_xpath("//a[normalize-space(.)='Home']")).click()
     WebDriverWait(browser.driver(), 10).until(expected_conditions.title_contains('PHPTRAVELS'))
+
+27. Add a test data excel in the test_data dir:
+
+Example: test_data.xlsx
+
+first_name	last_name	phone	email	address1	address2	city	state	postal_code	country	user_name	password	confirm_password
+Ketan	Ina	9833880808	abc@khop.com	H5, Haveli	MG Road	Pune	Maharashtra	411033	INDIA	dama	peeka	peeka
+Vineet	Meena	9823547654	fds@khop.com	Block 16, Meher	SB Road	Pune	Maharashtra	411023	INDIA	maka	rola	rola
+Rani	Deeka	9854323321	jhg@khop.com	3A/15, National Colony	New Friends	Pune	Maharashtra	411021	INDIA	neko	dika	dika
+Jayada	Dey	9878675645	ghf@khop.com	F1/12/ New Bakers	Nanapeth	Pune	Maharashtra	411038	INDIA	cheeka	rum	rum
+
+
+28. In the tests folder, Add test that use the excel data to run data driven tests.
+Also in the main method we can add code to run pytest with the required flags to create appropiate report.
+Example: ~/tests/test_new_tours.py
+
+import os
+import sys
+
+import pytest
+from selene import browser
+from selene.bys import by_xpath
+
+from definitions import REPORTS_DIR, TESTS_DIR, TEST_DATA_FILE
+from page_objects.new_tours_home_page import *
+from utils.general_utils.excel_utils import get_data_from_excel_for_parameterize
+from utils.general_utils.gen_utils import SoftAssert
+
+test_register_user_args = get_data_from_excel_for_parameterize(TEST_DATA_FILE, "test_register_user")
+
+
+@pytest.mark.parametrize(test_register_user_args[0], test_register_user_args[1])
+def test_register_user(first_name, last_name, phone, email, address1, address2, city, state, postal_code, country,
+                       user_name,
+                       password, confirm_password):
+    browser.open_url("http://newtours.demoaut.com/")
+    click_register_link()
+    register_user(f_name=first_name, l_name=last_name, number=phone, email=email, address1=address1, address2=address2,
+                  city=city, state=state, postal_code=postal_code, country=country, user_name=user_name,
+                  password=password, confirm_password=confirm_password)
+
+
+def test_all_links():
+    browser.open_url("http://newtours.demoaut.com/")
+    sa = SoftAssert()
+    s(by_xpath("//a[.='SIGN-OFF']")).click()
+    sa.assert_equals(browser.title(), "Sign-on: Mercury Tours", "The browser title for Sign on page did not match")
+    s(by_link_text("SUPPORT")).click()
+    sa.assert_equals(browser.title(), "Under Construction: Mercury Tour",
+                     "The browser title for Support page did not match")
+    s(by_link_text("REGISTER")).click()
+    sa.assert_equals(browser.title(), "Register: Mercury Tour",
+                     "The browser title for Support page did not match")
+    sa.assert_all()
+
+
+if __name__ == '__main__':
+    print('PYTHON PATH: ' + str(sys.path))
+    pytest.main(['--html=' + REPORTS_DIR + os.sep + 'test_new_tours_report.html',
+                 '--self-contained-html', '-v', '-q', '-s', os.path.join(TESTS_DIR, 'test_new_tours.py')])
+
+29. In the project dir, you can simply run the following command, which will run the tests, and logs and report will be generated in the respective directories.
+$ pipenv run python tests/test_new_tours.py
+

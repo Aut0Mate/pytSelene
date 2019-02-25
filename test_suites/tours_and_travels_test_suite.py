@@ -1,8 +1,5 @@
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(__file__, os.pardir, os.pardir)))
+from __init__ import *
 import pytest
-
 from definitions import REPORTS_DIR
 from utils.general_utils.gen_utils import get_test_file_path
 

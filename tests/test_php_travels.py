@@ -1,7 +1,7 @@
+from __init__ import *
 import pytest
 from selene.bys import by_text
 from selene.conditions import visible
-from __init__ import *
 from definitions import REPORTS_DIR, TESTS_DIR
 from page_objects.pt_home_page import *
 

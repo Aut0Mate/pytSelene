@@ -1,6 +1,4 @@
-import os
-import sys
-
+from __init__ import *
 import pytest
 from selene import browser
 from selene.bys import by_xpath
@@ -39,6 +37,5 @@ def test_all_links():
 
 
 if __name__ == '__main__':
-    print('PYTHON PATH: ' + str(sys.path))
     pytest.main(['--html=' + REPORTS_DIR + os.sep + 'test_new_tours_report.html',
                  '--self-contained-html', '-v', '-q', '-s', os.path.join(TESTS_DIR, 'test_new_tours.py')])

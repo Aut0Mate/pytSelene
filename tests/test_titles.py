@@ -1,5 +1,4 @@
-import os
-import sys
+from __init__ import *
 import pytest
 from selene import browser
 from selene.conditions import visible
@@ -28,6 +27,5 @@ def test_selene_assert():
 
 
 if __name__ == '__main__':
-    print('PYTHON PATH: ' + str(sys.path))
     pytest.main(['--html=' + REPORTS_DIR + os.sep + 'title_tests_report.html',
                  '--self-contained-html', '-v', '-q', '-s', os.path.join(TESTS_DIR, 'test_titles.py')])

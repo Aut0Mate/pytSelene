@@ -14,14 +14,11 @@ PROJECT_NAME = "vts_auto"
 logging.getLogger("seleniumwire.proxy.handler").setLevel(logging.WARNING)
 
 p = Path(os.getcwd())
-if str(p).endswith(PROJECT_NAME):  # when pytest is run from root directory
-    if str(p) not in sys.path: sys.path.insert(0, str(p))
-else:  # when pytest is run from roots subdirectories
+if not str(p).endswith(PROJECT_NAME):  # when pytest is run from roots subdirectories
     for path in p.parents:
         if str(path).endswith(PROJECT_NAME):
-            if str(p) not in sys.path: sys.path.insert(0, str(path))
+            if str(path) not in sys.path: sys.path.insert(0, str(path))
             break
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<XXXXXX>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-for line in sys.path:
-    print(line)
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<XXXXXX>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+else:
+    if str(p) not in sys.path: sys.path.insert(0, str(p))
+
