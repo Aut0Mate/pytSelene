@@ -17,8 +17,15 @@ $ export PIPENV_VENV_IN_PROJECT=1
 
 4. Install the pytest module in this directory - Alternatively you can start the pipenv shell (which will create your vertualenv if not alredy created)
 
-cd DependencyMgntDemoProject
+cd vts_auto
+
+
 $ pipenv shell (Optional)
+
+You can force the creation of a Python 2 or 3 environment with the arguments --two and --three respectively. Otherwise, Pipenv will use whatever default virtualenv finds.
+or provide specific version e.g. --python 3.6
+
+
 $ pipenv install pytest
 
 
